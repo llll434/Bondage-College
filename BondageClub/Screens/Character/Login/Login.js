@@ -4,9 +4,9 @@ var LoginMessage = "";
 var LoginCredits = null;
 var LoginCreditsPosition = 0;
 var LoginThankYou = "";
-var LoginThankYouList = ["Abby", "Aylea", "BlueEyedCat", "BlueWiner", "Bryce", "Christian", "Dini", "Epona", "Escurse", "FanRunner", 
-						 "Fluffythewhat", "Greendragon", "Jin", "Joe", "KamiKaze", "KBgamer", "Kimuriel", "Michal", "Michel", "Mike", 
-						 "Mindtie", "Misa", "Nick", "Overlord", "Rashiash", "Ray", "Rika", "Rutherford", "Ryner", "Samuel", 
+var LoginThankYouList = ["Abby", "Aylea", "BlueEyedCat", "BlueWiner", "Bryce", "Christian", "Dini", "Epona", "Escurse", "FanRunner",
+						 "Fluffythewhat", "Greendragon", "Jin", "Joe", "KamiKaze", "KBgamer", "Kimuriel", "Michal", "Michel", "Mike",
+						 "Mindtie", "Misa", "Nick", "Overlord", "Rashiash", "Ray", "Rika", "Rutherford", "Ryner", "Samuel",
 						 "Setsu", "Shadow", "Sky", "Tam", "Thomas", "Trent", "Troubadix", "William", "Xepherio", "Yurei"];
 var LoginThankYouNext = 0;
 var LoginSubmitted = false;
@@ -49,7 +49,7 @@ function LoginDrawCredits() {
 
 	// For each credits in the list
 	LoginCreditsPosition++;
-	MainCanvas.font = "30px Arial";
+	MainCanvas.font = "30px " +PreferenceStyleFont;
 	for (let C = 0; C < LoginCredits.length; C++) {
 
 		// Sets the Y position (it scrolls from bottom to top)
@@ -79,8 +79,8 @@ function LoginDrawCredits() {
 	}
 
 	// Restore the canvas font
-	MainCanvas.font = "36px Arial";
-	
+	MainCanvas.font = "36px " + PreferenceStyleFont;
+
 }
 
 /**
@@ -116,7 +116,7 @@ function LoginRun() {
 	if (LoginCredits != null) LoginDrawCredits();
 
 	if (!LoginMessage) LoginUpdateMessage();
-	
+
 	// Draw the login controls
 	DrawText(TextGet("Welcome"), 1000, 50, "White", "Black");
 	DrawText(LoginMessage, 1000, 100, "White", "Black");
@@ -256,15 +256,15 @@ function LoginValideBuyGroups() {
  * Checks if the player arrays contains any item that does not exists and saves them.
  * @returns {void} Nothing
  */
-function LoginValidateArrays() { 
+function LoginValidateArrays() {
 	var CleanBlockItems = AssetCleanArray(Player.BlockItems);
-	if (CleanBlockItems.length != Player.BlockItems.length) { 
+	if (CleanBlockItems.length != Player.BlockItems.length) {
 		Player.BlockItems = CleanBlockItems;
 		ServerSend("AccountUpdate", { BlockItems: Player.BlockItems });
 	}
-	
+
 	var CleanLimitedItems = AssetCleanArray(Player.LimitedItems);
-	if (CleanLimitedItems.length != Player.LimitedItems.length) { 
+	if (CleanLimitedItems.length != Player.LimitedItems.length) {
 		Player.LimitedItems = CleanLimitedItems;
 		ServerSend("AccountUpdate", { LimitedItems: Player.LimitedItems });
 	}
@@ -346,7 +346,7 @@ function LoginResponse(C) {
 			Player.HiddenItems = ((C.HiddenItems == null) || !Array.isArray(C.HiddenItems)) ? [] : C.HiddenItems;
 			Player.Difficulty = C.Difficulty;
 			Player.WardrobeCharacterNames = C.WardrobeCharacterNames;
-			WardrobeCharacter = [];			
+			WardrobeCharacter = [];
 			LoginDifficulty();
 
 			// Loads the ownership data
@@ -463,7 +463,7 @@ function LoginResponse(C) {
  * @returns {void} Nothing
  */
 function LoginClick() {
-	
+
 	// Opens the cheat panel
 	if (CheatAllow && ((MouseX >= 825) && (MouseX <= 1175) && (MouseY >= 870) && (MouseY <= 930))) {
 		ElementRemove("InputName");
@@ -488,7 +488,7 @@ function LoginClick() {
 		InventoryRemove(Player, "ItemArms");
 		CharacterAppearanceLoadCharacter(Player);
 	}
-	
+
 	// Try to login
 	if ((MouseX >= 775) && (MouseX <= 975) && (MouseY >= 500) && (MouseY <= 560)) LoginDoLogin();
 
@@ -500,7 +500,7 @@ function LoginClick() {
 		AssetLoadDescription("Female3DCG");
 		LoginUpdateMessage();
 	}
-	
+
 }
 
 /**

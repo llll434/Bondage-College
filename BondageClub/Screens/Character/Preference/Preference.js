@@ -48,6 +48,7 @@ var PreferenceVisibilityBlockList = [];
 var PreferenceVisibilityResetClicked = false;
 var PreferenceDifficultyLevel = null;
 var PreferenceDifficultyAccept = false;
+var PreferenceStyleFont = "Papyrus";
 
 /**
  * Gets the effect of a sexual activity on the player
@@ -83,7 +84,7 @@ function PreferenceGetFetishFactor(C, Type) {
 }
 
 /**
- * Sets the love factor of a sexual activity for the character 
+ * Sets the love factor of a sexual activity for the character
  * @param {Character} C - The character for whom the activity factor should be set
  * @param {string} Type - The type of the activity that is performed
  * @param {boolean} Self - Determines, if the current player is giving (false) or receiving (true)
@@ -114,7 +115,7 @@ function PreferenceGetZoneFactor(C, Zone) {
 }
 
 /**
- * Sets the love factor for a specific body zone on the player 
+ * Sets the love factor for a specific body zone on the player
  * @param {Character} C - The character, for whom the love factor of a particular zone should be set
  * @param {string} Zone - The name of the zone, the factor should be set for
  * @param {number} Factor - The factor of the zone (0 is horrible, 2 is normal, 4 is great)
@@ -277,7 +278,7 @@ function PreferenceInit(C) {
 		PreferenceSettingsSensDepIndex = PreferenceSettingsSensDepList.length - 1;
 		Player.GameplaySettings.SensDepChatLog = PreferenceSettingsSensDepList[PreferenceSettingsSensDepIndex];
 	}
-	
+
 	// TODO: The following preferences were migrated September 2020 in for R61 - replace with standard preference code after a few months
 	PreferenceMigrate(C.ChatSettings, C.OnlineSettings, "AutoBanBlackList", false);
 	PreferenceMigrate(C.ChatSettings, C.OnlineSettings, "AutoBanGhostList", true);
@@ -286,7 +287,7 @@ function PreferenceInit(C) {
 	PreferenceMigrate(C.ChatSettings, C.OnlineSettings, "SearchFriendsFirst", false);
 	PreferenceMigrate(C.GameplaySettings, C.OnlineSettings, "EnableAfkTimer", true);
 	PreferenceMigrate(C.GameplaySettings, C.OnlineSettings, "EnableWardrobeIcon", false);
-	
+
 	// Validates the player preference, they must match with the assets activities & zones, default factor is 2 (normal love)
 	if (Player.AssetFamily == "Female3DCG") {
 
@@ -403,7 +404,7 @@ function PreferenceRun() {
 
 	// If a subscreen is active, draw that instead
 	if (PreferenceSubscreen != "") return CommonDynamicFunction("PreferenceSubscreen" + PreferenceSubscreen + "Run()");
-	
+
 	// Draw the player & controls
 	DrawCharacter(Player, 50, 50, 0.9);
 	DrawButton(1815, 75, 90, 90, "", "White", "Icons/Exit.png");
@@ -579,7 +580,7 @@ function PreferenceSubscreenGeneralClick() {
 		if (!Player.GameplaySettings.EnableSafeword && !Player.IsRestrained() && !Player.IsChaste()) {
 			if (PreferenceSafewordConfirm) {
 				Player.GameplaySettings.EnableSafeword = true;
-				PreferenceSafewordConfirm = false; 
+				PreferenceSafewordConfirm = false;
 			} else PreferenceSafewordConfirm = true;
 		} else if (Player.GameplaySettings.EnableSafeword) {
 			if (PreferenceSafewordConfirm) {
@@ -894,7 +895,7 @@ function PreferenceSubscreenVisibilityRun() {
 	DrawButton(1820, 60, 90, 90, "", "White", "Icons/Cancel.png", TextGet("LeaveNoSave"));
 	MainCanvas.textAlign = "left";
 	DrawText(TextGet("VisibilityPreferences"), 500, 125, "Black", "Gray");
-	
+
 	// Not available in Extreme mode
 	if (Player.GetDifficulty() <= 2) {
 
@@ -914,12 +915,12 @@ function PreferenceSubscreenVisibilityRun() {
 		DrawBackNextButton(650, 193, 500, 64, PreferenceVisibilityGroupList[PreferenceVisibilityGroupIndex].Group.Description, "White", "", () => "", () => "");
 		DrawBackNextButton(650, 272, 500, 64, PreferenceVisibilityGroupList[PreferenceVisibilityGroupIndex].Assets[PreferenceVisibilityAssetIndex].Asset.Description, "White", "", () => "", () => "");
 		DrawButton(500, PreferenceVisibilityResetClicked ? 780 : 700, 300, 64, TextGet("VisibilityReset"), "White", "");
-		
+
 		// Preview icon
 		DrawEmptyRect(1200, 193, 225, 225, "Black");
 		if (PreferenceVisibilityPreviewImg == null) DrawRect(1203, 196, 219, 219, "LightGray");
 		else DrawImageResize(PreferenceVisibilityPreviewImg, 1202, 195, 221, 221);
-		
+
 	} else {
 		MainCanvas.textAlign = "center";
 		DrawText(TextGet("VisibilityLocked"), 1200, 500, "Red", "Gray");
@@ -941,7 +942,7 @@ function PreferenceSubscreenGraphicsRun() {
 	MainCanvas.textAlign = "left";
 	DrawText(TextGet("VFXPreferences"), 500, 125, "Black", "Gray");
 	DrawText(TextGet("VFX"), 800, 246, "Black", "Gray");
-	
+
 	MainCanvas.textAlign = "center";
 	DrawBackNextButton(500, 212, 250, 64, TextGet(Player.ArousalSettings.VFX), "White", "",
 		() => TextGet(PreferenceSettingsVFXList[(PreferenceSettingsVFXIndex + PreferenceSettingsVFXList.length - 1) % PreferenceSettingsVFXList.length]),
@@ -950,7 +951,7 @@ function PreferenceSubscreenGraphicsRun() {
 }
 
 /**
- * Handles click events for the audio preference settings.  Redirected from the main Click function. 
+ * Handles click events for the audio preference settings.  Redirected from the main Click function.
  * @returns {void} - Nothing
  */
 function PreferenceSubscreenGraphicsClick() {
@@ -1122,7 +1123,7 @@ function PreferenceSubscreenArousalClick() {
 			else PreferenceArousalActivityIndex = (PreferenceArousalActivityIndex + 1) % PreferenceArousalActivityList.length;
 			PreferenceLoadActivityFactor();
 		}
-		
+
 		// Arousal activity love on self control
 		if ((MouseX >= 900) && (MouseX < 1200) && (MouseY >= 633) && (MouseY <= 697)) {
 			if (MouseX <= 1050) PreferenceArousalActivityFactorSelf = (5 + PreferenceArousalActivityFactorSelf - 1) % 5;
@@ -1406,4 +1407,12 @@ function PreferenceSubscreenSecurityLoad() {
  */
 function PreferenceIsPlayerInSensDep() {
 	return (Player.GameplaySettings && ((Player.GameplaySettings.SensDepChatLog == "SensDepNames") || (Player.GameplaySettings.SensDepChatLog == "SensDepTotal") || (Player.GameplaySettings.SensDepChatLog == "SensDepExtreme")) && (Player.GetDeafLevel() >= 3) && (Player.GetBlindLevel() >= 3));
+}
+
+function PreferenceStyleFontLoad(){
+   return PreferenceStyleFont;
+}
+
+function PreferenceStyleFontSet(font){
+   PreferenceStyleFont = font;
 }
