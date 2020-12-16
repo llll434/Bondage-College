@@ -336,8 +336,8 @@ function PreferenceInit(C) {
 	AfkTimerSetEnabled((C.ID == 0) && C.OnlineSettings && (C.OnlineSettings.EnableAfkTimer != false));
 
    // Graphical settings
-   if (!Player.GraphicsSettings) Player.GraphicsSettings = {Font: "Arial"}
-   if (!Player.GraphicsSettings.Font) Player.GraphicsSettings.Font = "Arial";
+   if (!C.GraphicsSettings) C.GraphicsSettings = {Font: "Arial"}
+   if (!C.GraphicsSettings.Font) C.GraphicsSettings.Font = "Arial";
 }
 
 /**
