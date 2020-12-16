@@ -48,7 +48,7 @@ var PreferenceVisibilityBlockList = [];
 var PreferenceVisibilityResetClicked = false;
 var PreferenceDifficultyLevel = null;
 var PreferenceDifficultyAccept = false;
-var PreferenceGraphicsFontList = ["Arial", "Times New Roman", "Papyrus", "Comic Sans", "Impact", "Verdana"];
+var PreferenceGraphicsFontList = ["Arial", "Times New Roman", "Papyrus", "Comic Sans", "Impact", "Verdana", "Century Gothic", "Georgia", "Courier New", "Copperplate"];
 var PreferenceGraphicsFontIndex = 0;
 
 /**
@@ -730,7 +730,8 @@ function PreferenceExit() {
 		RestrictionSettings: Player.RestrictionSettings,
 		ArousalSettings: Player.ArousalSettings,
 		OnlineSettings: Player.OnlineSettings,
-		OnlineSharedSettings: Player.OnlineSharedSettings
+		OnlineSharedSettings: Player.OnlineSharedSettings,
+      GraphicsSettings: Player.GraphicsSettings
 	};
 	ServerSend("AccountUpdate", P);
 	PreferenceMessage = "";
