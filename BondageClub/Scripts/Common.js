@@ -12,7 +12,7 @@ var CutsceneStage = 0;
 
 /**
  * Checks if a variable is a number
- * @param {*} n - Variable to check for 
+ * @param {*} n - Variable to check for
  * @returns {boolean} - Returns TRUE if the variable is a finite number
  */
 function CommonIsNumeric(n) {
@@ -286,8 +286,8 @@ function CommonTime() {
 
 /**
  * Checks if a given value is a valid HEX color code
- * @param {string} Value - Potential HEX color code 
- * @returns {boolean} - Returns TRUE if the string is a valid HEX color 
+ * @param {string} Value - Potential HEX color code
+ * @returns {boolean} - Returns TRUE if the string is a valid HEX color
  */
 function CommonIsColor(Value) {
 	if ((Value == null) || (Value.length < 3)) return false;
@@ -311,7 +311,7 @@ function CommonRandomItemFromList(ItemPrevious, ItemList) {
 /**
  * Converts a string of numbers split by commas to an array, sanitizes the array by removing all NaN or undefined elements.
  * @param {string} s - String of numbers split by commas
- * @returns {number[]} - Array of valid numbers from the given string 
+ * @returns {number[]} - Array of valid numbers from the given string
  */
 function CommonConvertStringToArray(s) {
 	var arr = [];
@@ -395,4 +395,16 @@ function CommonDebounce(func, wait) {
 		}
 		return result;
 	};
+}
+
+// Get size + font
+function CommonGetFont(size) {
+  const font = (Player && Player.GraphicsSettings && Player.GraphicsSettings.Font) || "Arial";
+  return `${size}px ${font}`;
+}
+
+// Get the name of the font only
+function CommonGetFontName() {
+  const font = (Player && Player.GraphicsSettings && Player.GraphicsSettings.Font) || "Arial";
+  return `${font}`;
 }

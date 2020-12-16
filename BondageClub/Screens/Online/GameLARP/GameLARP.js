@@ -170,10 +170,10 @@ function GameLARPRunProcess() {
 			DrawButton(50, 900, 400, 65, OnlineGameDictionaryText("BackToCharacters"), "White");
 
 			// Draw the timer
-			MainCanvas.font = "108px " + PreferenceStyleFont;
+			MainCanvas.font = CommonGetFont(108);
 			var Time = Math.ceil((GameLARPTurnTimer - TimerGetTime()) / 1000);
 			DrawText(((Time < 0) || (Time > GameLARPTimerDelay[GameLARPTimerDelay.length - 1])) ? OnlineGameDictionaryText("TimerNA") : Time.toString(), 250, 800, "Red", "White");
-			MainCanvas.font = "36px " + PreferenceStyleFont;
+			MainCanvas.font = CommonGetFont(36);
 
 		}
 

@@ -62,7 +62,7 @@ function DrawLoad() {
 	document.addEventListener("keydown", DocumentKeyDown);
 
 	// Font is fixed for now, color can be set
-	MainCanvas.font = "36px " + PreferenceStyleFont;
+	MainCanvas.font = CommonGetFont(36);
 	MainCanvas.textAlign = "center";
 	MainCanvas.textBaseline = "middle";
 
@@ -201,9 +201,9 @@ function DrawArousalMeter(C, X, Y, Zoom) {
 
 
 				if (C.ArousalZoom && (typeof C.ArousalSettings.OrgasmCount === "number") && (C.ArousalSettings.OrgasmCount >= 0) && (C.ArousalSettings.OrgasmCount <= 9999)) {
-					MainCanvas.font = Math.round(36 * Zoom).toString() + "px " + PreferenceStyleFont;
+					MainCanvas.font = CommonGetFont(Math.round(36 * Zoom).toString());
 					DrawText(((C.ArousalSettings.OrgasmCount != null) ? C.ArousalSettings.OrgasmCount : 0).toString(), X + 100 * Zoom, Y + 655 * Zoom, "Black", "Gray");
-					MainCanvas.font = "36px " + PreferenceStyleFont;
+					MainCanvas.font = CommonGetFont(36);
 				}
 			}
 }
@@ -327,9 +327,9 @@ function DrawCharacter(C, X, Y, Zoom, IsHeightResizeAllowed) {
 		// Draw the character name below herself
 		if ((C.Name != "") && ((CurrentModule == "Room") || (CurrentModule == "Online") || ((CurrentScreen == "Wardrobe") && (C.ID != 0))) && (CurrentScreen != "Private"))
 			if (!Player.IsBlind() || (Player.GameplaySettings && Player.GameplaySettings.SensDepChatLog == "SensDepLight")) {
-				MainCanvas.font = "30px " + PreferenceStyleFont;
+				MainCanvas.font = CommonGetFont(30);
 				DrawText(C.Name, X + 255 * Zoom, Y + 980 * ((C.Pose.indexOf("SuspensionHogtied") < 0) ? Zoom : Zoom / HeightRatio), (CommonIsColor(C.LabelColor)) ? C.LabelColor : "White", "Black");
-				MainCanvas.font = "36px " + PreferenceStyleFont;
+				MainCanvas.font = CommonGetFont(36);
 			}
 
 	}
@@ -710,14 +710,14 @@ function DrawTextWrap(Text, X, Y, Width, Height, ForeColor, BackColor, MaxLine) 
 function DrawTextFit(Text, X, Y, Width, Color) {
 
 	for (let S = 36; S >= 10; S = S - 2) {
-		MainCanvas.font = S.toString() + "px " +  PreferenceStyleFont;
+		MainCanvas.font = CommonGetFont(S.toString());
 		var metrics = MainCanvas.measureText(Text);
 		if (metrics.width <= Width)
 			break;
 	}
 	MainCanvas.fillStyle = Color;
 	MainCanvas.fillText(Text, X, Y);
-	MainCanvas.font = "36px " + PreferenceStyleFont;
+	MainCanvas.font = CommonGetFont(36);
 }
 
 /**

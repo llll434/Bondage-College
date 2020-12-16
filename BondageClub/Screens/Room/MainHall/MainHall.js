@@ -159,9 +159,9 @@ function MainHallRun() {
 
 	// Draws the character and main hall buttons
 	DrawCharacter(Player, 750, 0, 1);
-	MainCanvas.font = "italic 30px " + PreferenceStyleFont;
+	MainCanvas.font = "italic " + CommonGetFont(30);
 	DrawTextWrap(TextGet("Tip" + MainHallTip), 100, 800, 500, 200, "White");
-	MainCanvas.font = "36px " + PreferenceStyleFont;
+	MainCanvas.font = CommonGetFont(36);
 
 	// Char, Dressing, Exit & Chat
 	DrawButton(1645, 25, 90, 90, "", "White", "Icons/Character.png", TextGet("Profile"));

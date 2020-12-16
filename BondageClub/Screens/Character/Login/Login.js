@@ -49,7 +49,7 @@ function LoginDrawCredits() {
 
 	// For each credits in the list
 	LoginCreditsPosition++;
-	MainCanvas.font = "30px " +PreferenceStyleFont;
+	MainCanvas.font = "30px Arial";
 	for (let C = 0; C < LoginCredits.length; C++) {
 
 		// Sets the Y position (it scrolls from bottom to top)
@@ -79,7 +79,7 @@ function LoginDrawCredits() {
 	}
 
 	// Restore the canvas font
-	MainCanvas.font = "36px " + PreferenceStyleFont;
+	MainCanvas.font = CommonGetFont(36);
 
 }
 

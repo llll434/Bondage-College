@@ -48,7 +48,8 @@ var PreferenceVisibilityBlockList = [];
 var PreferenceVisibilityResetClicked = false;
 var PreferenceDifficultyLevel = null;
 var PreferenceDifficultyAccept = false;
-var PreferenceStyleFont = "Papyrus";
+var PreferenceGraphicsFontList = ["Arial", "Times New Roman", "Papyrus", "Comic Sans"];
+var PreferenceGraphicsFontIndex = 0;
 
 /**
  * Gets the effect of a sexual activity on the player
@@ -334,6 +335,9 @@ function PreferenceInit(C) {
 	// Enables the AFK timer for the current player only
 	AfkTimerSetEnabled((C.ID == 0) && C.OnlineSettings && (C.OnlineSettings.EnableAfkTimer != false));
 
+   // Graphical settings
+   if (!Player.GraphicsSettings) Player.GraphicsSettings = {Font: "Arial"}
+   if (!Player.GraphicsSettings.Font) Player.GraphicsSettings.Font = "Arial";
 }
 
 /**
@@ -392,6 +396,9 @@ function PreferenceLoad() {
 			PreferenceArousalFetishList.push(FetishFemale3DCG[A].Name);
 	PreferenceArousalFetishIndex = 0;
 	PreferenceLoadFetishFactor();
+
+   // Sets the Players text font
+   PreferenceGraphicsFontIndex = (PreferenceGraphicsFontList.indexOf(Player.GraphicsSettings.Font) < 0) ? 0 : PreferenceGraphicsFontList.indexOf(Player.GraphicsSettings.Font);
 
 }
 
@@ -948,6 +955,9 @@ function PreferenceSubscreenGraphicsRun() {
 		() => TextGet(PreferenceSettingsVFXList[(PreferenceSettingsVFXIndex + PreferenceSettingsVFXList.length - 1) % PreferenceSettingsVFXList.length]),
 		() => TextGet(PreferenceSettingsVFXList[(PreferenceSettingsVFXIndex + 1) % PreferenceSettingsVFXList.length]));
 
+   DrawBackNextButton(500, 300, 250, 64, TextGet(Player.GraphicsSettings.Font), "White", "",
+      () => TextGet(PreferenceGraphicsFontList[(PreferenceGraphicsFontIndex + PreferenceGraphicsFontList.length - 1) % PreferenceGraphicsFontList.length]),
+      () => TextGet(PreferenceGraphicsFontList[(PreferenceGraphicsFontIndex + 1) % PreferenceGraphicsFontList.length]));
 }
 
 /**
@@ -960,6 +970,11 @@ function PreferenceSubscreenGraphicsClick() {
 		if (MouseX <= 625) PreferenceSettingsVFXIndex = (PreferenceSettingsVFXList.length + PreferenceSettingsVFXIndex - 1) % PreferenceSettingsVFXList.length;
 		else PreferenceSettingsVFXIndex = (PreferenceSettingsVFXIndex + 1) % PreferenceSettingsVFXList.length;
 		Player.ArousalSettings.VFX = PreferenceSettingsVFXList[PreferenceSettingsVFXIndex];
+   }
+   if (MouseIn(500, 300, 250, 64)) {
+		if (MouseX <= 625) PreferenceGraphicsFontIndex = (PreferenceGraphicsFontList.length + PreferenceGraphicsFontIndex - 1) % PreferenceGraphicsFontList.length;
+      else PreferenceGraphicsFontIndex = (PreferenceGraphicsFontIndex + 1) % PreferenceGraphicsFontList.length;
+   	Player.GraphicsSettings.Font = PreferenceGraphicsFontList[PreferenceGraphicsFontIndex];
 	}
 }
 
@@ -1407,12 +1422,4 @@ function PreferenceSubscreenSecurityLoad() {
  */
 function PreferenceIsPlayerInSensDep() {
 	return (Player.GameplaySettings && ((Player.GameplaySettings.SensDepChatLog == "SensDepNames") || (Player.GameplaySettings.SensDepChatLog == "SensDepTotal") || (Player.GameplaySettings.SensDepChatLog == "SensDepExtreme")) && (Player.GetDeafLevel() >= 3) && (Player.GetBlindLevel() >= 3));
-}
-
-function PreferenceStyleFontLoad(){
-   return PreferenceStyleFont;
-}
-
-function PreferenceStyleFontSet(font){
-   PreferenceStyleFont = font;
 }

@@ -238,7 +238,7 @@ function ElementPosition(ElementID, X, Y, W, H) {
 	if (E) {
 		Object.assign(E.style, {
 			fontSize: Font + "px",
-			fontFamily: PreferenceStyleFont,
+			fontFamily: CommonGetFontName(),
 			position: "absolute",
 			left: Left + "px",
 			top: Top + "px",
@@ -285,7 +285,7 @@ function ElementPositionFix(ElementID, Font, X, Y, W, H) {
 	var E = document.getElementById(ElementID);
 	Object.assign(E.style, {
 		fontSize: Font + "px",
-		fontFamily: PreferenceStyleFont,
+		fontFamily: CommonGetFontName(),
 		position: "absolute",
 		left: Left + "px",
 		top: Top + "px",
