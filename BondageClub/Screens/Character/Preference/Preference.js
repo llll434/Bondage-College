@@ -48,7 +48,7 @@ var PreferenceVisibilityBlockList = [];
 var PreferenceVisibilityResetClicked = false;
 var PreferenceDifficultyLevel = null;
 var PreferenceDifficultyAccept = false;
-var PreferenceGraphicsFontList = ["Arial", "Times New Roman", "Papyrus", "Comic Sans"];
+var PreferenceGraphicsFontList = ["Arial", "Times New Roman", "Papyrus", "Comic Sans", "Impact", "Verdana"];
 var PreferenceGraphicsFontIndex = 0;
 
 /**
@@ -949,6 +949,7 @@ function PreferenceSubscreenGraphicsRun() {
 	MainCanvas.textAlign = "left";
 	DrawText(TextGet("VFXPreferences"), 500, 125, "Black", "Gray");
 	DrawText(TextGet("VFX"), 800, 246, "Black", "Gray");
+   DrawText(TextGet("GraphicsFont"), 800, 336, "Black", "Gray");
 
 	MainCanvas.textAlign = "center";
 	DrawBackNextButton(500, 212, 250, 64, TextGet(Player.ArousalSettings.VFX), "White", "",
