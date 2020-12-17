@@ -379,6 +379,7 @@ function LoginResponse(C) {
 			Player.FriendNames = typeof C.FriendNames === "string" ? new Map(JSON.parse(LZString.decompressFromUTF16(C.FriendNames))) : new Map();
 			Player.SubmissivesList = typeof C.SubmissivesList === "string" ? new Set(JSON.parse(LZString.decompressFromUTF16(C.SubmissivesList))) : new Set();
 			Player.GhostList = ((C.GhostList == null) || !Array.isArray(C.GhostList)) ? [] : C.GhostList;
+         Player.GraphicsSettings = C.GraphicsSettings;
 
 			// Loads the player character model and data
 			Player.Appearance = ServerAppearanceLoadFromBundle(Player, C.AssetFamily, C.Appearance);
