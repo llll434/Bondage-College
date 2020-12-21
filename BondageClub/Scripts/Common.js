@@ -296,6 +296,19 @@ function CommonIsColor(Value) {
 }
 
 /**
+ * Checks whether an item's color has a valid value that can be interpreted by the drawing
+ * functions. Valid values are null, undefined, strings, and an array containing any of the
+ * aforementioned types.
+ * @param {*} Color - The Color value to check
+ * @returns {boolean} - Returns TRUE if the color is a valid item color
+ */
+function CommonColorIsValid(Color) {
+	if (Color == null || typeof Color === "string") return true;
+	if (Array.isArray(Color)) return Color.every(C => C == null || typeof C === "string");
+	return false;
+}
+
+/**
  * Get a random item from a list while making sure not to pick the previous one.
  * @param {*} ItemPrevious - Previously selected item from the given list
  * @param {*} ItemList - List for which to pick a random item from
@@ -396,6 +409,38 @@ function CommonDebounce(func, wait) {
 		return result;
 	};
 }
+/**
+ * Creates a simple memoizer. 
+ * The memoized function does calculate its result exactly once and from that point on, uses
+ * the result stored in a local cache to speed up things.
+ * @param {function} func - The function to memoize
+ * @returns {any} - The result of the memoized function
+ */
+function CommonMemoize(func) {
+	var memo = {};
+	var slice = Array.prototype.slice;
+
+	var memoized = function () {
+		var index = [];
+		for (var i = 0; i < arguments.length; i++) {
+			if (typeof arguments[i] === "object") {
+				index.push(JSON.stringify(arguments[i]));
+			} else {
+				index.push(slice.call(arguments[i]));
+			}
+		} // for
+		if (!(index in memo)) {
+			memo[index] = func.apply(this, arguments);
+		}
+		return memo[index];
+	}; // function
+
+	// add a clear cache method
+	memoized.clearCache = function () {
+		memo = {};
+	}
+	return memoized;
+} // CommonMemoize
 
 // Get size + font
 function CommonGetFont(size) {

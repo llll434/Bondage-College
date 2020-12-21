@@ -145,13 +145,13 @@ function ChatRoomCanStopSlowPlayer() { return (CurrentCharacter.IsSlow() && Play
  * Checks if the player can grab the targeted player's leash
  * @returns {boolean} - TRUE if the player can interact and is allowed to interact with the current character.
  */
-function ChatRoomCanHoldLeash() { return CurrentCharacter.AllowItem && Player.CanInteract() && CurrentCharacter.OnlineSharedSettings && CurrentCharacter.OnlineSharedSettings.AllowPlayerLeashing && ChatRoomLeashList.indexOf(CurrentCharacter.MemberNumber) < 0
+function ChatRoomCanHoldLeash() { return CurrentCharacter.AllowItem && Player.CanInteract() && CurrentCharacter.OnlineSharedSettings && CurrentCharacter.OnlineSharedSettings.AllowPlayerLeashing != false && ChatRoomLeashList.indexOf(CurrentCharacter.MemberNumber) < 0
 	&& ChatRoomCanBeLeashed(CurrentCharacter)}
 /**
  * Checks if the player can let go of the targeted player's leash
  * @returns {boolean} - TRUE if the player can interact and is allowed to interact with the current character.
  */
-function ChatRoomCanStopHoldLeash() { if (CurrentCharacter.AllowItem && Player.CanInteract() && CurrentCharacter.OnlineSharedSettings && CurrentCharacter.OnlineSharedSettings.AllowPlayerLeashing && ChatRoomLeashList.indexOf(CurrentCharacter.MemberNumber) >= 0) {
+function ChatRoomCanStopHoldLeash() { if (CurrentCharacter.AllowItem && Player.CanInteract() && CurrentCharacter.OnlineSharedSettings && CurrentCharacter.OnlineSharedSettings.AllowPlayerLeashing != false && ChatRoomLeashList.indexOf(CurrentCharacter.MemberNumber) >= 0) {
 		if (ChatRoomCanBeLeashed(CurrentCharacter)) {
 			return true
 		} else {
@@ -177,13 +177,13 @@ function ChatRoomCanBeLeashed(C) {
 					neckLock = InventoryGetLock(Player.Appearance[A])
 			}
 		}
-	if ((C.Effect.indexOf("Tethered") >= 0) || (C.Effect.indexOf("Mounted") >= 0) || (C.Effect.indexOf("Enclosed") >= 0)) isTrapped = true
+	if ((C.Effect.indexOf("Tethered") >= 0) || (C.Effect.indexOf("Mounted") >= 0) || (C.Effect.indexOf("Enclose") >= 0)) isTrapped = true
 	
 	if (canLeash && !isTrapped) {
 		if (!neckLock || (!neckLock.Asset.OwnerOnly && !neckLock.Asset.LoverOnly) ||
-			(neckLock.Asset.OwnerOnly && C.Ownership && C.Ownership.MemberNumber == data.MemberNumber) ||
-			(neckLock.Asset.LoverOnly && C.GetLoversNumbers() && C.GetLoversNumbers().indexOf(data.MemberNumber) >= 0))
-		{
+			(neckLock.Asset.OwnerOnly && C.IsOwnedByPlayer()) ||
+			(neckLock.Asset.LoverOnly && C.IsLoverOfPlayer()) ||
+			C.ID == 0) {
 			return true
 		}
 	}
@@ -239,6 +239,43 @@ function ChatRoomLoad() {
 	ChatRoomCreateElement();
 	ChatRoomCharacterUpdate(Player);
 	ActivityChatRoomArousalSync(Player);
+}
+
+/**
+ * Removes all elements that can be open in the chat room
+*/
+function ChatRoomClearAllElements() {
+	// Friendlist
+	ElementRemove("FriendList");
+	
+	// Admin
+	ElementRemove("InputName");
+	ElementRemove("InputDescription");
+	ElementRemove("InputSize");
+	ElementRemove("InputAdminList");
+	ElementRemove("InputBanList");
+	ElementRemove("InputBackground");
+	ElementRemove("TagDropDown");
+	
+	// Chatroom
+	ElementRemove("InputChat");
+	ElementRemove("TextAreaChatLog");
+	
+	// Dialog
+	DialogLeave()
+	
+	// Preferences
+	ElementRemove("InputEmailOld");
+	ElementRemove("InputEmailNew");
+	ElementRemove("InputCharacterLabelColor");
+	
+	// Profile
+    ElementRemove("DescriptionInput");
+	
+	// Wardrobe
+	ElementRemove("InputWardrobeName"); 
+	
+	
 }
 
 /**
@@ -399,12 +436,13 @@ function ChatRoomDrawCharacter(DoClick) {
 			DrawCharacter(ChatRoomCharacter[C], CharX, CharY, Zoom);
 			if (ChatRoomTargetMemberNumber == ChatRoomCharacter[C].MemberNumber) DrawImage("Icons/Small/Whisper.png", CharX + 75 * Zoom, CharY + 950 * Zoom);
 
-			// Draw the friendlist / blacklist / whitelist icons
+			// Draw the ghostlist/friendlist, whitelist/blacklist, admin icons
 			if (ChatRoomCharacter[C].MemberNumber != null) {
-				if (Player.WhiteList.indexOf(ChatRoomCharacter[C].MemberNumber) >= 0) DrawImage("Icons/Small/WhiteList.png", CharX + 75 * Zoom, CharY);
-				else if (Player.BlackList.indexOf(ChatRoomCharacter[C].MemberNumber) >= 0) DrawImage("Icons/Small/BlackList.png", CharX + 75 * Zoom, CharY);
-				if (Player.GhostList.indexOf(ChatRoomCharacter[C].MemberNumber) >= 0) DrawImage("Icons/Small/GhostList.png", CharX + 375 * Zoom, CharY);
-				else if (Player.FriendList.indexOf(ChatRoomCharacter[C].MemberNumber) >= 0) DrawImage("Icons/Small/FriendList.png", CharX + 375 * Zoom, CharY);
+				if (Player.WhiteList.includes(ChatRoomCharacter[C].MemberNumber)) DrawImageResize("Icons/Small/WhiteList.png", CharX + 75 * Zoom, CharY, 50 * Zoom, 50 * Zoom);
+				else if (Player.BlackList.includes(ChatRoomCharacter[C].MemberNumber)) DrawImageResize("Icons/Small/BlackList.png", CharX + 75 * Zoom, CharY, 50 * Zoom, 50 * Zoom);
+				if (Array.isArray(ChatRoomData.Admin) && ChatRoomData.Admin.includes(ChatRoomCharacter[C].MemberNumber))  DrawImageResize("Icons/Small/Admin.png", CharX + 125 * Zoom, CharY, 50 * Zoom, 50 * Zoom);
+				if (Player.GhostList.includes(ChatRoomCharacter[C].MemberNumber)) DrawImageResize("Icons/Small/GhostList.png", CharX + 375 * Zoom, CharY, 50 * Zoom, 50 * Zoom);
+				else if (Player.FriendList.includes(ChatRoomCharacter[C].MemberNumber)) DrawImageResize("Icons/Small/FriendList.png", CharX + 375 * Zoom, CharY, 50 * Zoom, 50 * Zoom);
 			}
 		}
 	}
@@ -481,8 +519,7 @@ function ChatRoomRun() {
 		if ((CurrentTime > ChatRoomSlowtimer) && (ChatRoomSlowtimer != 0)) {
 			ChatRoomSlowtimer = 0;
 			ChatRoomSlowStop = false;
-			ElementRemove("InputChat");
-			ElementRemove("TextAreaChatLog");
+			ChatRoomClearAllElements();
 			ServerSend("ChatRoomLeave", "");
 			CommonSetScreen("Online", "ChatSearch");
 		}
@@ -511,7 +548,7 @@ function ChatRoomRun() {
 	DrawButton(1875, 2, 120, 60, "", "White", "Icons/Rectangle/Preference.png", TextGet("MenuAdmin"));
 
 	// In orgasm mode, we add a pink filter and different controls depending on the stage.  The pink filter shows a little above 90
-	if ((Player.ArousalSettings != null) && (Player.ArousalSettings.Active != null) && (Player.ArousalSettings.Active != "Inactive") && (Player.ArousalSettings.Active != "NoMeter")) {
+	if ((Player.ArousalSettings != null) && (Player.ArousalSettings.Active != null) && (Player.ArousalSettings.Active != "Inactive") && (Player.ArousalSettings.Active != "NoMeter")) {	
 		if ((Player.ArousalSettings.OrgasmTimer != null) && (typeof Player.ArousalSettings.OrgasmTimer === "number") && !isNaN(Player.ArousalSettings.OrgasmTimer) && (Player.ArousalSettings.OrgasmTimer > 0)) {
 			DrawRect(0, 0, 1003, 1000, "#FFB0B0B0");
 			DrawRect(1003, 0, 993, 63, "#FFB0B0B0");
@@ -525,7 +562,8 @@ function ChatRoomRun() {
 			if (Player.ArousalSettings.OrgasmStage == 2) DrawText(TextGet("OrgasmRecovering"), 500, 500, "White", "Black");
 			ActivityOrgasmProgressBar(50, 970);
 		} else if ((Player.ArousalSettings.Progress != null) && (Player.ArousalSettings.Progress >= 91) && (Player.ArousalSettings.Progress <= 99)) {
-			if ((ChatRoomCharacter.length <= 2) || (ChatRoomCharacter.length >= 6)) DrawRect(0, 0, 1003, 1000, "#FFB0B040");
+			if ((ChatRoomCharacter.length <= 2) || (ChatRoomCharacter.length >= 6) ||
+				(Player.GameplaySettings && (Player.GameplaySettings.SensDepChatLog == "SensDepExtreme" && Player.GameplaySettings.BlindDisableExamine) && (Player.GetBlindLevel() >= 3))) DrawRect(0, 0, 1003, 1000, "#FFB0B040");
 			else if (ChatRoomCharacter.length == 3) DrawRect(0, 50, 1003, 900, "#FFB0B040");
 			else if (ChatRoomCharacter.length == 4) DrawRect(0, 150, 1003, 700, "#FFB0B040");
 			else if (ChatRoomCharacter.length == 5) DrawRect(0, 250, 1003, 500, "#FFB0B040");
@@ -560,14 +598,13 @@ function ChatRoomClick() {
 
 	// When the user leaves
 	if (MouseIn(1005, 0, 120, 62) && ChatRoomCanLeave() && !Player.IsSlow()) {
-		ElementRemove("InputChat");
-		ElementRemove("TextAreaChatLog");
+		ChatRoomClearAllElements();
 		ServerSend("ChatRoomLeave", "");
 		CommonSetScreen("Online", "ChatSearch");
 		CharacterDeleteAllOnline();
 		
 		// Clear leash since the player has escaped
-		ChatRoomLeashPlayer = ""
+		ChatRoomLeashPlayer = null
 	}
 
 	// When the player is slow and attempts to leave
@@ -675,6 +712,8 @@ function ChatRoomKeyDown() {
 		ElementValue("InputChat", ChatRoomLastMessage[ChatRoomLastMessageIndex]);
 	}
 
+	// On escape, scroll to the bottom of the chat
+	if (KeyPress == 27) ElementScrollToEnd("TextAreaChatLog");
 }
 
 /**
@@ -1369,9 +1408,11 @@ function ChatRoomSyncItem(data) {
 			if ((data.Item.Name == null) || (data.Item.Name == "")) {
 				InventoryRemove(ChatRoomCharacter[C], data.Item.Group);
 			} else {
+				var Color = data.Item.Color;
+				if (!CommonColorIsValid(Color)) Color = "Default";
 
 				// Wear the item and applies locks and properties if we need to
-				InventoryWear(ChatRoomCharacter[C], data.Item.Name, data.Item.Group, data.Item.Color, data.Item.Difficulty);
+				InventoryWear(ChatRoomCharacter[C], data.Item.Name, data.Item.Group, Color, data.Item.Difficulty);
 				if (data.Item.Property != null) {
 					var Item = InventoryGet(ChatRoomCharacter[C], data.Item.Group);
 					if (Item != null) {
@@ -1751,8 +1792,7 @@ function ChatRoomSetRule(data) {
 		if (data.Content == "OwnerRuleTimerCell60") TimerCell = 60;
 		if (TimerCell > 0) {
 			ServerSend("ChatRoomChat", { Content: "ActionGrabbedForCell", Type: "Action", Dictionary: [{ Tag: "TargetCharacterName", Text: Player.Name, MemberNumber: Player.MemberNumber }] });
-			ElementRemove("InputChat");
-			ElementRemove("TextAreaChatLog");
+			ChatRoomClearAllElements();
 			ServerSend("ChatRoomLeave", "");
 			CharacterDeleteAllOnline();
 			CellLock(TimerCell);
@@ -1780,8 +1820,7 @@ function ChatRoomSetRule(data) {
 			CharacterSetActivePose(Player, null);
 			var D = TextGet("ActionGrabbedToServeDrinksIntro");
 			ServerSend("ChatRoomChat", { Content: "ActionGrabbedToServeDrinks", Type: "Action", Dictionary: [{ Tag: "TargetCharacterName", Text: Player.Name, MemberNumber: Player.MemberNumber }] });
-			ElementRemove("InputChat");
-			ElementRemove("TextAreaChatLog");
+			ChatRoomClearAllElements();
 			ServerSend("ChatRoomLeave", "");
 			CharacterDeleteAllOnline();
 			CommonSetScreen("Room", "MaidQuarters");
@@ -1879,8 +1918,7 @@ function ChatRoomSafewordRelease() {
 	CharacterReleaseTotal(Player);
 	CharacterRefresh(Player);
 	ServerSend("ChatRoomChat", { Content: "ActionActivateSafewordRelease", Type: "Action", Dictionary: [{Tag: "SourceCharacter", Text: Player.Name}] });
-	ElementRemove("InputChat");
-	ElementRemove("TextAreaChatLog");
+	ChatRoomClearAllElements();
 	ServerSend("ChatRoomLeave", "");
 	CommonSetScreen("Online","ChatSearch");
 }
