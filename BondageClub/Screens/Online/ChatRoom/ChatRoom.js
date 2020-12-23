@@ -170,25 +170,35 @@ function ChatRoomCanStopHoldLeash() { if (CurrentCharacter.AllowItem && Player.C
  * @returns {boolean} - TRUE if the player can be leashed
  */
 function ChatRoomCanBeLeashed(C) {
+	return ChatRoomCanBeLeashedBy(Player.MemberNumber, C);
+}
+
+/**
+ * Checks if the targeted player is a valid leash target for the source member number
+ * @param {number} sourceMemberNumber - Member number of the source player
+ * @param {Character} C - Target player
+ * @returns {boolean} - TRUE if the player can be leashed
+ */
+function ChatRoomCanBeLeashedBy(sourceMemberNumber, C) {
 	// Have to not be tethered, and need a leash
 	var canLeash = false
 	var isTrapped = false
 	var neckLock = null
 	for (let A = 0; A < C.Appearance.length; A++)
 		if ((C.Appearance[A].Asset != null) && (C.Appearance[A].Asset.Group.Family == C.AssetFamily)) {
-			if (C.Appearance[A].Asset.Name.indexOf("Leash") >= 0 || (C.Appearance[A].Property && C.Appearance[A].Property.Type && C.Appearance[A].Property.Type.indexOf("Leash") >= 0)) {
+			if (InventoryItemHasEffect(C.Appearance[A], "Leash", true)) {
 				canLeash = true
 				if (C.Appearance[A].Asset.Group.Name == "ItemNeckRestraints")
-					neckLock = InventoryGetLock(Player.Appearance[A])
+					neckLock = InventoryGetLock(C.Appearance[A])
+			} else if (InventoryItemHasEffect(C.Appearance[A], "Tethered", true) || InventoryItemHasEffect(C.Appearance[A], "Mounted", true) || InventoryItemHasEffect(C.Appearance[A], "Enclose", true)){
+				isTrapped = true
 			}
 		}
-	if ((C.Effect.indexOf("Tethered") >= 0) || (C.Effect.indexOf("Mounted") >= 0) || (C.Effect.indexOf("Enclose") >= 0)) isTrapped = true
-	
+
 	if (canLeash && !isTrapped) {
 		if (!neckLock || (!neckLock.Asset.OwnerOnly && !neckLock.Asset.LoverOnly) ||
-			(neckLock.Asset.OwnerOnly && C.IsOwnedByPlayer()) ||
-			(neckLock.Asset.LoverOnly && C.IsLoverOfPlayer()) ||
-			C.ID == 0) {
+			(neckLock.Asset.OwnerOnly && C.IsOwnedByMemberNumber(sourceMemberNumber)) ||
+			(neckLock.Asset.LoverOnly && C.IsLoverOfMemberNumber(sourceMemberNumber))) {
 			return true
 		}
 	}
@@ -1019,7 +1029,7 @@ function ChatRoomMessage(data) {
 					if (SenderCharacter.MemberNumber != ChatRoomLeashPlayer && ChatRoomLeashPlayer != null) {
 						ServerSend("ChatRoomChat", { Content: "RemoveLeash", Type: "Hidden", Target: ChatRoomLeashPlayer });
 					}
-					if (ChatRoomCanBeLeashed(Player)) {
+					if (ChatRoomCanBeLeashedBy(SenderCharacter.MemberNumber, Player)) {
 						ChatRoomLeashPlayer = SenderCharacter.MemberNumber
 					} else {
 						ServerSend("ChatRoomChat", { Content: "RemoveLeash", Type: "Hidden", Target: SenderCharacter.MemberNumber });
@@ -1030,8 +1040,8 @@ function ChatRoomMessage(data) {
 						ChatRoomLeashPlayer = null
 					}
 				}
-				else if (msg == "PingHoldLeash"){ // The dom will ping all players on her leash list and ones that no longer have her as their leasher will remove it
-					if (SenderCharacter.MemberNumber != ChatRoomLeashPlayer || !ChatRoomCanBeLeashed(Player)) {
+				if (msg == "PingHoldLeash"){ // The dom will ping all players on her leash list and ones that no longer have her as their leasher will remove it
+					if (SenderCharacter.MemberNumber != ChatRoomLeashPlayer || !ChatRoomCanBeLeashedBy(SenderCharacter.MemberNumber, Player)) {
 						ServerSend("ChatRoomChat", { Content: "RemoveLeash", Type: "Hidden", Target: SenderCharacter.MemberNumber });
 					}
 				}
