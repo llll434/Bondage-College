@@ -243,6 +243,25 @@ function LoginLoversItems() {
 }
 
 /**
+ * Adds or removes Asylum items. Only players that have previously maxed out their patient or nurse reputation are
+ * eligible for their own set of Asylum restraints outside the Asylum.
+ * @returns {void} - Nothing
+ */
+function LoginAsylumItems() {
+	if (LogQuery("ReputationMaxed", "Asylum")) {
+		InventoryAddMany(Player, [
+			{Name: "MedicalBedRestraints", Group: "ItemArms"},
+			{Name: "MedicalBedRestraints", Group: "ItemLegs"},
+			{Name: "MedicalBedRestraints", Group: "ItemFeet"},
+		], false);
+	} else {
+		InventoryDelete(Player, "MedicalBedRestraints", "ItemArms", false);
+		InventoryDelete(Player, "MedicalBedRestraints", "ItemLegs", false);
+		InventoryDelete(Player, "MedicalBedRestraints", "ItemFeet", false);
+	}
+}
+
+/**
  * Checks every owned item to see if its BuyGroup contains an item the player does not have. This allows the player to
  * collect any items that have been added to the game which are in a BuyGroup that they have already purchased.
  * @returns {void} Nothing
@@ -403,6 +422,10 @@ function LoginResponse(C) {
 
 			// Calls the preference init to make sure the preferences are loaded correctly
 			PreferenceInit(Player);
+			if (Player.VisualSettings) {
+				if (Player.VisualSettings.PrivateRoomBackground) PrivateBackground = Player.VisualSettings.PrivateRoomBackground;
+				if (Player.VisualSettings.MainHallBackground) MainHallBackground = Player.VisualSettings.MainHallBackground;
+			}
 			ActivitySetArousal(Player, 0);
 			ActivityTimerProgress(Player, 0);
 
@@ -432,6 +455,7 @@ function LoginResponse(C) {
 			LoginMistressItems();
 			LoginStableItems();
 			LoginLoversItems();
+			LoginAsylumItems();
 			LoginValideBuyGroups();
 			LoginValidateArrays();
 			if (InventoryBeforeFixes != InventoryStringify(Player)) ServerPlayerInventorySync();
