@@ -1,5 +1,6 @@
 "use strict"
 var InventoryItemNeckSlaveCollarColorMode = false;
+var InventoryItemNeckSlaveCollarFuturisticCollarMode = false;
 var InventoryItemNeckSlaveCollarColor = "Default";
 var InventoryItemNeckSlaveCollarOffset = 0;
 
@@ -85,6 +86,10 @@ var InventoryItemNeckSlaveCollarTypes = [
         Name: "HeartLinkChoker",
         Image: "HeartLinkChoker",
         Property: { Type: "HeartLinkChoker", Effect: [], Block: [] }
+	},{
+        Name: "FuturisticCollar",
+        Image: "FuturisticCollar",
+        Property: { Type: "FuturisticCollar", Effect: [], Block: [], OpenPermission: false }
 	}
 ];
 
@@ -118,12 +123,17 @@ function InventoryItemNeckSlaveCollarDraw() {
             DrawButton(1665, 25, 90, 90, "", "White", "Icons/ColorSelect.png");
             DrawButton(1775, 25, 90, 90, "", "White", "Icons/ColorCancel.png");
 
+        }else if (InventoryItemNeckSlaveCollarFuturisticCollarMode) {
+           InventoryItemNeckFuturisticCollarDraw();
         } else {
 
             // In regular mode, the owner can select the collar model and change the offset to get the next 8 models
             ColorPickerHide();
 			DrawText(DialogFind(Player, "SlaveCollarSelectType"), 1500, 250, "white", "gray");
 			DrawButton(1665, 25, 90, 90, "", "White", "Icons/Next.png");
+         if (DialogFocusItem.Property.Type == "FuturisticCollar") {
+            DrawButton(1555, 25, 90, 90, "", "White", "Icons/Use.png");
+         }
 			DrawButton(1775, 25, 90, 90, "", (DialogFocusItem.Color != null && DialogFocusItem.Color != "Default" && DialogFocusItem.Color != "None") ? DialogFocusItem.Color : "White", "Icons/ColorPick.png");
 			for (let I = InventoryItemNeckSlaveCollarOffset; I < InventoryItemNeckSlaveCollarTypes.length && I < InventoryItemNeckSlaveCollarOffset + 8; I++) {
 				var Type = DialogFocusItem && DialogFocusItem.Property && DialogFocusItem.Property.Type || "";
@@ -134,7 +144,6 @@ function InventoryItemNeckSlaveCollarDraw() {
 
 		}
     }
-
 }
 
 // Catches the item extension clicks
@@ -143,6 +152,7 @@ function InventoryItemNeckSlaveCollarClick() {
 	// When the user exits the screen
     if ((MouseX >= 1885) && (MouseX <= 1975) && (MouseY >= 25) && (MouseY <= 110)) {
 		ElementRemove("InputColor");
+      InventoryItemNeckSlaveCollarFuturisticCollarMode = false;
 		DialogFocusItem = null;
 		return;
 	}
@@ -165,11 +175,11 @@ function InventoryItemNeckSlaveCollarClick() {
                 }
             }
             if ((MouseX >= 1775) && (MouseX <= 1865) && (MouseY >= 25) && (MouseY <= 110)) {
-				InventoryItemNeckSlaveCollarColor = "Default";
-                InventoryItemNeckSlaveCollarColorMode = false;
-                CharacterAppearanceSetColorForGroup(C, InventoryItemNeckSlaveCollarColor, "ItemNeck");
-                ElementRemove("InputColor");
-                CharacterLoadCanvas(C);
+               InventoryItemNeckSlaveCollarColor = "Default";
+               InventoryItemNeckSlaveCollarColorMode = false;
+               CharacterAppearanceSetColorForGroup(C, InventoryItemNeckSlaveCollarColor, "ItemNeck");
+               ElementRemove("InputColor");
+               CharacterLoadCanvas(C);
             }
             if ((MouseX >= 1300) && (MouseX < 1975) && (MouseY >= 145) && (MouseY < 975)) {
                 var Color = DrawRGBToHex(MainCanvas.getImageData(MouseX, MouseY, 1, 1).data);
@@ -178,12 +188,20 @@ function InventoryItemNeckSlaveCollarClick() {
                 ElementValue("InputColor", Color);
             }
 
-        } else {
-			
+        } else if (InventoryItemNeckSlaveCollarFuturisticCollarMode) {
+           InventoryItemNeckSlaveCollarFuturisticCollarMode = false;
+           InventoryItemNeckFuturisticCollarClick();
+        }else {
+
 			// In regular mode, the owner can select the collar model and change the offset to get the next 8 models
-            if ((MouseX >= 1665) && (MouseX <= 1755) && (MouseY >= 25) && (MouseY <= 110)) {
+            if ((MouseX >= 1665) && (MouseX <= 1775) && (MouseY >= 25) && (MouseY <= 110)) {
 				InventoryItemNeckSlaveCollarOffset = InventoryItemNeckSlaveCollarOffset + 8;
 				if (InventoryItemNeckSlaveCollarOffset >= InventoryItemNeckSlaveCollarTypes.length) InventoryItemNeckSlaveCollarOffset = 0;
+            }
+            if ((MouseX >= 1555) && (MouseX <= 1665) && (MouseY >= 25) && (MouseY <= 110)) {
+               if (DialogFocusItem.Property.Type == "FuturisticCollar") {
+                  InventoryItemNeckSlaveCollarFuturisticCollarMode=true;
+               }
             }
             if ((MouseX >= 1775) && (MouseX <= 1865) && (MouseY >= 25) && (MouseY <= 110)) {
                 InventoryItemNeckSlaveCollarColorMode = true;
