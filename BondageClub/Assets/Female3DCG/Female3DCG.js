@@ -2386,10 +2386,10 @@ var AssetFemale3DCG = [
 			{ Name: "LeatherCollarBow", Fetish: ["Leather"], Value: 25, Difficulty: 50, Time: 5, AllowLock: true },
 			{ Name: "SlaveCollar", Value: -1, Difficulty: 50, Time: 5, Enable: false, Random: false, OwnerOnly: true, Effect: ["Lock"], AllowBlock: ["ItemMouth", "ItemMouth2", "ItemMouth3"], AllowEffect: ["GagNormal", "FixedHead"], AllowType: ["SteelPosture", "LeatherPosture", "PetCollar", "HighCollar", "LeatherCollarBell", "LeatherCollarBow", "MaidCollar", "BatCollar", "HighSecurityCollar", "SpikeCollar", "BordelleCollar", "LeatherCorsetCollar", "StrictPostureCollar", "LatexPostureCollar", "HeartCollar", "NobleCorsetCollar", "OrnateCollar", "LoveLeatherCollar", "SlenderSteelCollar", "HeartLinkChoker", "NeckRope", "FuturisticCollar"], Extended: true, AllowColorize: true, Layer: [
             	{ Name: "", AllowColorize: true },
-            	{ Name: "Display", AllowTypes: ["FuturisticCollar"] },
-            	{ Name: "Lock", AllowTypes: ["FuturisticCollar"] },
-            	{ Name: "Band", AllowTypes: ["FuturisticCollar"] },
-            	{ Name: "Mesh",  AllowTypes: ["FuturisticCollar"]},
+            	{ Name: "Display", AllowColorize: true, AllowTypes: ["FuturisticCollar"] },
+            	{ Name: "Lock", AllowColorize: true, AllowTypes: ["FuturisticCollar"] },
+            	{ Name: "Band", AllowColorize: true, AllowTypes: ["FuturisticCollar"] },
+                { Name: "Mesh",  HasType: false},
          ] },
 			{ Name: "ClubSlaveCollar", Value: -1, Difficulty: 50, Time: 5, Enable: false, Random: false, Effect: ["Lock"], ExpressionTrigger: [{ Name: "Medium", Group: "Blush", Timer: 15 }] },
 			{
