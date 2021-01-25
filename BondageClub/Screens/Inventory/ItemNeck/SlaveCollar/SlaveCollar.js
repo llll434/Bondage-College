@@ -153,9 +153,7 @@ function InventoryItemNeckSlaveCollarClick() {
 
 	// When the user exits the screen
     if ((MouseX >= 1885) && (MouseX <= 1975) && (MouseY >= 25) && (MouseY <= 110) ) {
-      if (InventoryItemNeckSlaveCollarColorMode && DialogFocusItem.Property.Type == "FuturisticCollar") {
-         ItemColorSaveClick();
-      }else {
+      if (!InventoryItemNeckSlaveCollarColorMode && !DialogFocusItem.Property.Type == "FuturisticCollar") {
          ElementRemove("InputColor");
          DialogSlaveCollarColorExit = false;
          InventoryItemNeckSlaveCollarFuturisticCollarMode = false;
