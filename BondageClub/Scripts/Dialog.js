@@ -6,6 +6,7 @@ var DialogProgress = -1;
 var DialogColor = null;
 var DialogExpressionColor = null;
 var DialogColorSelect = null;
+var DialogSlaveCollarColorExit = false;
 var DialogPreviousCharacterData = {};
 var DialogProgressStruggleCount = 0;
 var DialogProgressAuto = 0;
@@ -54,7 +55,7 @@ var DialogSelfMenuOptions = [
 	},
 	{
 		Name: "Pose",
-		IsAvailable: () => (CurrentScreen == "ChatRoom" || CurrentScreen == "Photographic"), 
+		IsAvailable: () => (CurrentScreen == "ChatRoom" || CurrentScreen == "Photographic"),
 		Draw: DialogDrawPoseMenu,
 		Click: DialogClickPoseMenu,
 	},
@@ -648,9 +649,9 @@ function DialogInventorySort() {
 	DialogInventory.sort((a, b) => (a.SortOrder > b.SortOrder) ? 1 : ((b.SortOrder > a.SortOrder) ? -1 : 0));
 }
 
-// 
+//
 /**
- * Build the inventory listing for the dialog which is what's equipped, 
+ * Build the inventory listing for the dialog which is what's equipped,
  * the player's inventory and the character's inventory for that group
  * @param {Character} C - The character whose inventory must be built
  * @param {number} [Offset] - The offset to be at, if specified.
@@ -755,12 +756,12 @@ function DialogFacialExpressionsBuild() {
  */
 function DialogActivePoseMenuBuild() {
 	DialogActivePoses = [];
-	
+
 	PoseFemale3DCG
 		.filter(P => P.AllowMenu)
 		.map(P => P.Category)
 		.filter((C, I, Categories) => C && Categories.indexOf(C) === I)
-		.forEach(Category => { 
+		.forEach(Category => {
 			DialogActivePoses.push(PoseFemale3DCG.filter(P =>  P.AllowMenu && P.Category == Category));
 		});
 }
@@ -788,7 +789,7 @@ function DialogProgressGetOperation(C, PrevItem, NextItem) {
 }
 
 /**
- * Starts the dialog progress bar and keeps the items that needs to be added / swaped / removed. 
+ * Starts the dialog progress bar and keeps the items that needs to be added / swaped / removed.
  * The change of facial expressions during struggling is done here
  * @param {boolean} Reverse - If set to true, the progress is decreased
  * @returns {void} - Nothing
@@ -797,7 +798,7 @@ function DialogStruggle(Reverse) {
 
 	// Progress calculation
 	var P = 42 / (DialogProgressSkill * CheatFactor("DoubleItemSpeed", 0.5)); // Regular progress, slowed by long timers, faster with cheats
-	P = P * (100 / (DialogProgress + 50));  // Faster when the dialog starts, longer when it ends	
+	P = P * (100 / (DialogProgress + 50));  // Faster when the dialog starts, longer when it ends
 	if ((DialogProgressChallenge > 6) && (DialogProgress > 50) && (DialogProgressAuto < 0)) P = P * (1 - ((DialogProgress - 50) / 50)); // Beyond challenge 6, it becomes impossible after 50% progress
 	P = P * (Reverse ? -1 : 1); // Reverses the progress if the user pushed the same key twice
 
@@ -1338,7 +1339,7 @@ function DialogClick() {
 						if (!Player.CanTalk()) CurrentCharacter.CurrentDialog = DialogFind(CurrentCharacter, "PlayerGagged");
 						else CurrentCharacter.CurrentDialog = CurrentCharacter.Dialog[D].Result;
 
-						// A dialog option can change the conversation stage, show text or launch a custom function						
+						// A dialog option can change the conversation stage, show text or launch a custom function
 						if ((Player.CanTalk() && CurrentCharacter.CanTalk()) || SpeechFullEmote(CurrentCharacter.Dialog[D].Option)) {
 							CurrentCharacter.CurrentDialog = CurrentCharacter.Dialog[D].Result;
 							if (CurrentCharacter.Dialog[D].NextStage != null) CurrentCharacter.Stage = CurrentCharacter.Dialog[D].NextStage;
@@ -1407,14 +1408,14 @@ function DialogGetCharacterZone(C, Zone, X, Y, Zoom, HeightRatio) {
  * Finds and sets the next available character sub menu.
  * @returns {void} - Nothing
  */
-function DialogFindNextSubMenu() { 
+function DialogFindNextSubMenu() {
 	var CurrentIndex = DialogSelfMenuOptions.indexOf(DialogSelfMenuSelected);
 	if (CurrentIndex == -1) CurrentIndex = 0;
-	
+
 	var NextIndex = CurrentIndex + 1 == DialogSelfMenuOptions.length ? 0 : CurrentIndex + 1;
-	
-	for (let SM = NextIndex; SM < DialogSelfMenuOptions.length; SM++) { 
-		if (DialogSelfMenuOptions[SM].IsAvailable()) { 
+
+	for (let SM = NextIndex; SM < DialogSelfMenuOptions.length; SM++) {
+		if (DialogSelfMenuOptions[SM].IsAvailable()) {
 			DialogSelfMenuSelected = DialogSelfMenuOptions[SM];
 			return;
 		}
@@ -1433,7 +1434,7 @@ function DialogSetText(NewText) {
 }
 
 /**
- * Shows the extended item menue for a given item, if possible. 
+ * Shows the extended item menue for a given item, if possible.
  * Therefore a dynamic function name is created and then called.
  * @param {Item} Item - The item the extended menu should be shown for
  * @param {Item} SourceItem - The source of the extended menu
@@ -1536,7 +1537,7 @@ function DialogDrawItemMenu(C) {
 		let ButtonHoverText = (DialogColor == null) ? DialogFind(Player, DialogMenuButton[I]) : null;
 		DrawButton(1885 - I * 110, 15, 90, 90, "", ButtonColor, "Icons/" + ButtonImage + ".png", ButtonHoverText);
 	}
-	
+
 	// Draws the color picker
 	if (!FocusItem && DialogColor != null) {
 		ElementPosition("InputColor", 1450, 65, 300);
@@ -1547,7 +1548,7 @@ function DialogDrawItemMenu(C) {
 	// In item permission mode, the player can choose which item he allows other users to mess with.  Allowed items have a green background.  Disallowed have a red background. Limited have an orange background
 	if ((DialogItemPermissionMode && (C.ID == 0) && (DialogProgress < 0)) || (Player.CanInteract() && (DialogProgress < 0) && !InventoryGroupIsBlocked(C, null, true))) {
 
-		
+
 		if (DialogInventory == null) DialogInventoryBuild(C);
 
 		//If only activities are allowed, only add items to the DialogInventory, which can be used for interactions
@@ -1608,7 +1609,7 @@ function DialogDrawItemMenu(C) {
 		// Add or subtract to the automatic progression, doesn't move in color picking mode
 		DialogProgress = DialogProgress + DialogProgressAuto;
 		if (DialogProgress < 0) DialogProgress = 0;
-		
+
 		// We cancel out if at least one of the following cases apply: a new item conflicts with this, the player can no longer interact, something else was added first, the item was already removed
 		if (InventoryGroupIsBlocked(C) || (C != Player && !Player.CanInteract()) || (DialogProgressNextItem == null && !InventoryGet(C, DialogProgressPrevItem.Asset.Group.Name)) || (DialogProgressNextItem != null && !InventoryAllow(C, DialogProgressNextItem.Asset.Prerequisite)) || (DialogProgressNextItem != null && DialogProgressPrevItem != null && ((InventoryGet(C, DialogProgressPrevItem.Asset.Group.Name) && InventoryGet(C, DialogProgressPrevItem.Asset.Group.Name).Asset.Name != DialogProgressPrevItem.Asset.Name) || !InventoryGet(C, DialogProgressPrevItem.Asset.Group.Name))) || (DialogProgressNextItem != null && DialogProgressPrevItem == null && InventoryGet(C, DialogProgressNextItem.Asset.Group.Name))) {
 			if (DialogProgress > 0)
@@ -1631,7 +1632,7 @@ function DialogDrawItemMenu(C) {
 			// Stops the dialog sounds
 			AudioDialogStop();
 
-			// Removes the item & associated items if needed, then wears the new one 
+			// Removes the item & associated items if needed, then wears the new one
 			InventoryRemove(C, C.FocusGroup.Name);
 			if (DialogProgressNextItem != null) InventoryWear(C, DialogProgressNextItem.Asset.Name, DialogProgressNextItem.Asset.Group.Name, (DialogColorSelect == null) ? "Default" : DialogColorSelect, SkillGetWithRatio("Bondage"), Player.MemberNumber);
 
@@ -1691,13 +1692,13 @@ function DialogDrawItemMenu(C) {
 
 /**
  * Searches in the dialog for a specific stage keyword and returns that dialog option if we find it
- * @param {Character} C - The character whose dialog optio* 
+ * @param {Character} C - The character whose dialog optio*
  * @param {string} KeyWord1 - The key word to search for
- * @param {string} [KeyWord2] - An optionally given second key word. is only looked for, if specified and the first 
+ * @param {string} [KeyWord2] - An optionally given second key word. is only looked for, if specified and the first
  * keyword was not found.
  * @param {boolean} [ReturnPrevious] - If specified, returns the previous dialog, if neither of the the two key words were found
  ns should be searched
- * @returns {string} - The name of a dialog. That can either be the one with the keyword or the previous dialog. 
+ * @returns {string} - The name of a dialog. That can either be the one with the keyword or the previous dialog.
  * An empty string is returned, if neither keyword was found and no previous dialog was given.
  */
 function DialogFind(C, KeyWord1, KeyWord2, ReturnPrevious) {
@@ -1719,7 +1720,7 @@ function DialogFind(C, KeyWord1, KeyWord2, ReturnPrevious) {
  * keyword was not found.
  * @param {boolean} [ReturnPrevious] - If specified, returns the previous dialog, if neither of the the two key words were found
  * @returns {string} - The name of a dialog. That can either be the one with the keyword or the previous dialog.
- * An empty string is returned, if neither keyword was found and no previous dialog was given. 'SourceCharacter' 
+ * An empty string is returned, if neither keyword was found and no previous dialog was given. 'SourceCharacter'
  * is replaced with the player's name and 'DestinationCharacter' with the current character's name.
  */
 function DialogFindAutoReplace(C, KeyWord1, KeyWord2, ReturnPrevious) {
@@ -1755,7 +1756,9 @@ function DialogDraw() {
 		// The view can show one specific extended item or the list of all items for a group
 		if (DialogFocusItem != null) {
 			CommonDynamicFunction("Inventory" + DialogFocusItem.Asset.Group.Name + DialogFocusItem.Asset.Name + "Draw()");
-			DrawButton(1885, 25, 90, 90, "", "White", "Icons/Exit.png");
+         if (!DialogSlaveCollarColorExit) {
+            DrawButton(1885, 25, 90, 90, "", "White", "Icons/Exit.png");
+         }
 		} else {
 			if (DialogActivityMode) DialogDrawActivityMenu(C);
 			else DialogDrawItemMenu(C);
@@ -1900,20 +1903,20 @@ function DialogClickExpressionMenu() {
  * Draws the pose sub menu
  * @returns {void} - Nothing
  */
-function DialogDrawPoseMenu() { 
+function DialogDrawPoseMenu() {
 	// Draw the pose groups
 	DrawText(DialogFind(Player, "PoseMenu"), 250, 100, "White", "Black");
 
 	if (!DialogActivePoses || !DialogActivePoses.length) DialogActivePoseMenuBuild();
-	
-	for (let I = 0; I < DialogActivePoses.length; I++) { 
+
+	for (let I = 0; I < DialogActivePoses.length; I++) {
 		var OffsetX = 140 + 140 * I;
 		var PoseGroup = DialogActivePoses[I];
-		
-		for (let P = 0; P < PoseGroup.length; P++) { 
+
+		for (let P = 0; P < PoseGroup.length; P++) {
 			var OffsetY = 180 + 100 * P;
 			var IsActive = false;
-			
+
 			if (typeof Player.ActivePose == "string" && Player.ActivePose == PoseGroup[P].Name)
 				IsActive = true;
 			else if (Array.isArray(Player.ActivePose)) {
@@ -1936,18 +1939,18 @@ function DialogDrawPoseMenu() {
  * @returns {void} - Nothing
  */
 function DialogClickPoseMenu() {
-	for (let I = 0; I < DialogActivePoses.length; I++) { 
+	for (let I = 0; I < DialogActivePoses.length; I++) {
 		var OffsetX = 140 + 140 * I;
 		var PoseGroup = DialogActivePoses[I];
-		for (let P = 0; P < PoseGroup.length; P++) { 
+		for (let P = 0; P < PoseGroup.length; P++) {
 			var OffsetY = 180 + 100 * P;
 			var IsActive = false;
-			
+
 			if (typeof Player.ActivePose == "string" && Player.ActivePose == PoseGroup[P].Name)
 				IsActive = true;
 			if (Array.isArray(Player.ActivePose) && Player.ActivePose.includes(PoseGroup[P].Name))
 				IsActive = true;
-			
+
 			if (MouseIn(OffsetX, OffsetY, 90, 90) && !IsActive && Player.CanChangeToPose(PoseGroup[P].Name)) {
 				CharacterSetActivePose(Player, PoseGroup[P].Name);
 				if (CurrentScreen == "ChatRoom") ServerSend("ChatRoomCharacterPoseUpdate", { Pose: Player.ActivePose });
@@ -1961,7 +1964,7 @@ function DialogClickPoseMenu() {
  * Sets the current character sub menu to the owner rules
  * @returns {void} - Nothing
  */
-function DialogViewOwnerRules() { 
+function DialogViewOwnerRules() {
 	DialogSelfMenuSelected = DialogSelfMenuOptions.find(M => M.Name == "OwnerRules");
 }
 
@@ -1969,12 +1972,12 @@ function DialogViewOwnerRules() {
  * Draws the owner rules sub menu
  * @returns {void} - Nothing
  */
-function DialogDrawOwnerRulesMenu() { 
+function DialogDrawOwnerRulesMenu() {
 	// Draw the pose groups
 	DrawText(DialogFind(Player, "OwnerRulesMenu"), 230, 100, "White", "Black");
 
 	var ToDisplay = [];
-	
+
 	if (LogQuery("BlockOwnerLockSelf", "OwnerRule")) ToDisplay.push({ Tag: "BlockOwnerLockSelf" });
 	if (LogQuery("BlockChange", "OwnerRule")) ToDisplay.push({ Tag: "BlockChange", Value: LogValue("BlockChange", "OwnerRule") });
 	if (LogQuery("BlockWhisper", "OwnerRule")) ToDisplay.push({ Tag: "BlockWhisper" });
@@ -1983,15 +1986,15 @@ function DialogDrawOwnerRulesMenu() {
 	if (LogQuery("BlockRemoteSelf", "OwnerRule")) ToDisplay.push({ Tag: "BlockRemoteSelf" });
 	if (LogQuery("ReleasedCollar", "OwnerRule")) ToDisplay.push({ Tag: "ReleasedCollar" });
 	if (ToDisplay.length == 0) ToDisplay.push({ Tag: "Empty" });
-	
-	for (let I = 0; I < ToDisplay.length; I++) { 
+
+	for (let I = 0; I < ToDisplay.length; I++) {
 		var OffsetY = 230 + 100 * I;
 		DrawText(DialogFind(Player, "OwnerRulesMenu" + ToDisplay[I].Tag) + (ToDisplay[I].Value ?  " " + TimerToString(ToDisplay[I].Value - CurrentTime) : ""), 250, OffsetY, "White", "Black");
 	}
 }
 
 /**
- * Sets the skill ratio for the player, will be a % of effectiveness applied to the skill when using it. 
+ * Sets the skill ratio for the player, will be a % of effectiveness applied to the skill when using it.
  * This way a player can use only a part of her bondage or evasion skill.
  * @param {string} SkillType - The name of the skill to influence
  * @param {strign} NewRatio - The ration of this skill that should be used
@@ -2003,7 +2006,7 @@ function DialogSetSkillRatio(SkillType, NewRatio) {
 
 /**
  * Sends an room administrative command to the server for the chat room from the player dialog
- * @param {string} ActionType - The name of the administrative command to use 
+ * @param {string} ActionType - The name of the administrative command to use
  * @param {string} Publish - Determines wether the action should be published to the ChatRoom. As this is a string, use "true" to do so
  * @returns {void} - Nothing
  */

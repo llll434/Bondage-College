@@ -216,9 +216,10 @@ ItemNeckLeatherChokerMetal,Metal
 ItemNeckFuturisticCollarBand,Band
 ItemNeckFuturisticCollarMesh,Mesh (for copying to items)
 ItemNeckFuturisticCollarDisplay,Display
-ItemNeckSlaveCollarFuturisticCollarBand,Band
-ItemNeckSlaveCollarFuturisticCollarDisplay,Display
-ItemNeckSlaveCollarFuturisticCollarMesh, Mesh (for copying to items)
+ItemNeckSlaveCollarBand,Band
+ItemNeckSlaveCollarDisplay,Display
+ItemNeckSlaveCollarLock,Lock
+ItemNeckSlaveCollar, Mesh (for copying to items)
 ItemNeckOrnateCollarCollar,Collar
 ItemNeckOrnateCollarGem,Gems
 ItemNeckAccessoriesCustomCollarTagTag,Tag
